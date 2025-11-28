@@ -5,61 +5,52 @@ import base.BaseTest;
 import org.openqa.selenium.WebElement;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import pages.DropdownPage;
 import pages.HomePage;
+import pages.DropdownPage;
 import pages.WebFormPage;
+
 
 import java.util.List;
 
-public class HomePageDropdownTests extends BaseTest {
+public class DropdownTests extends BaseTest {
 
     @Test
     public void testDropdownMenuSelection() {
-        // go to the dropdown menu page
         HomePage homePage = new HomePage(driver);
-        homePage.clickDropdownMenuLink();
+        homePage.navigateToDropdownMenu();
 
         DropdownPage dropdownPage = new DropdownPage(driver);
 
-        // test the first dropdown - left-click
         dropdownPage.openLeftClickDropdown();
         List<WebElement> options = dropdownPage.getAllOptions("");
         Assert.assertTrue(options.size() > 0, "Left-click dropdown should have options");
 
-        // click on an option from the left-click dropdown
         dropdownPage.selectOptionByText("Action", "");
         Assert.assertTrue(true, "Should be able to select Action from left-click dropdown");
 
-        // test the second dropdown - right-click
         dropdownPage.openRightClickDropdown();
         List<WebElement> rightClickOptions = dropdownPage.getAllOptions("context-menu-2");
         Assert.assertTrue(rightClickOptions.size() > 0, "Right-click dropdown should have options");
 
-        // click on an option from the right-click dropdown
         dropdownPage.selectOptionByText("Another action", "context-menu-2");
         Assert.assertTrue(true, "Should be able to select Another action from right-click dropdown");
 
-        // test the third dropdown - double-click
         dropdownPage.openDoubleClickDropdown();
         List<WebElement> doubleClickOptions = dropdownPage.getAllOptions("context-menu-3");
         Assert.assertTrue(doubleClickOptions.size() > 0, "Double-click dropdown should have options");
 
-        // click on an option from the double-click dropdown
         dropdownPage.selectOptionByText("Something else here", "context-menu-3");
         Assert.assertTrue(true, "Should be able to select option from double-click dropdown");
     }
 
     @Test
     public void testDropdownInWebForm() {
-        // go to web form page which has a dropdown too
         HomePage homePage = new HomePage(driver);
-        homePage.clickWebFormLink();
+        homePage.navigateToWebForm();
 
         WebFormPage webFormPage = new WebFormPage(driver);
 
-        // test selecting different options
         webFormPage.selectNumber("1");
-        // webformpage doesnt have getselectedoption so we just check it worked
         Assert.assertTrue(true, "First option should be selected");
 
         webFormPage.selectNumber("2");
@@ -70,7 +61,7 @@ public class HomePageDropdownTests extends BaseTest {
     public void testDropdownOptionsCount() {
 
         HomePage homePage = new HomePage(driver);
-        homePage.clickDropdownMenuLink();
+        homePage.navigateToDropdownMenu();
 
         DropdownPage dropdownPage = new DropdownPage(driver);
 

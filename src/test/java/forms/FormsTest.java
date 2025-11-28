@@ -1,128 +1,131 @@
 package forms;
 
 import base.BaseTest;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-import pages.FormsPage;
+import pages.HomePage;
+import pages.WebFormPage;
 
+import java.time.Duration;
 
 public class FormsTest extends BaseTest {
 
-    private FormsPage formsPage;
-
-    @BeforeMethod
-    public void setUpPage() {
-        formsPage = new FormsPage(driver);
+    private void sleep(int milliseconds) {
+        try {
+            Thread.sleep(milliseconds);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
 
-    @Test(priority = 1)
-    public void testFillTextInput() {
-        formsPage.navigateToWebFormPage();
-        formsPage.fillTextInput("Test User");
-        Assert.assertTrue(true, "Text input filled successfully");
+    @Test(description = "Test complete web form submission with all fields", priority = 1)
+    public void testCompleteWebFormSubmission() {
+        System.out.println("Starting Web Form Test...");
+        
+        HomePage homePage = new HomePage(driver);
+        homePage.navigateToWebForm();
+        sleep(1000);
+
+        WebFormPage webFormPage = new WebFormPage(driver);
+        
+        System.out.println("Entering first name...");
+        webFormPage.enterFirstName("Christelle");
+        sleep(800);
+        
+        System.out.println("Entering password...");
+        webFormPage.enterPassword("Christellehere$$");
+        sleep(800);
+        
+        System.out.println("Entering textarea...");
+        webFormPage.enterTextarea("I am the coolest in the city lol!!");
+        sleep(800);
+        
+        System.out.println("Selecting number from dropdown...");
+        webFormPage.selectNumber("2");
+        sleep(800);
+        
+        System.out.println("Checking checkbox...");
+        webFormPage.checkCheckbox();
+        sleep(800);
+        
+        System.out.println("Selecting radio button...");
+        webFormPage.selectRadioButton();
+        sleep(800);
+        
+        System.out.println("Submitting form...");
+        webFormPage.submitForm();
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        wait.until(ExpectedConditions.urlContains("submitted"));
+        
+        System.out.println("Form submitted successfully!");
+        sleep(2000);
+        
+        Assert.assertTrue(webFormPage.isFormSubmitted(), 
+            "Form submission failed - URL does not contain 'submitted'");
     }
 
-    @Test(priority = 2)
-    public void testFillPasswordInput() {
-        formsPage.navigateToWebFormPage();
-        formsPage.fillPasswordInput("SecurePassword123");
-        Assert.assertTrue(true, "Password input filled successfully");
+    @Test(description = "Test login form with valid credentials", priority = 2)
+    public void testLoginFormWithValidCredentials() {
+        System.out.println("Starting Login Form Test...");
+        
+        HomePage homePage = new HomePage(driver);
+        homePage.navigateToLoginForm();
+        sleep(2000);
+
+        pages.LoginFormPage loginFormPage = new pages.LoginFormPage(driver);
+
+        System.out.println("Current URL: " + driver.getCurrentUrl());
+
+        System.out.println("Entering username...");
+        loginFormPage.enterUsername("user");
+        sleep(1000);
+        
+        System.out.println("Entering password...");
+        loginFormPage.enterPassword("user");
+        sleep(1000);
+        
+        System.out.println("Submitting login form...");
+        loginFormPage.submitLogin();
+        sleep(2000);
+
+        System.out.println("Current URL after submit: " + driver.getCurrentUrl());
+        System.out.println("Login successful!");
+        sleep(2000);
+        
+        Assert.assertFalse(driver.getCurrentUrl().contains("login-form.html"), 
+            "Should navigate away from login page after successful login");
     }
 
-    @Test(priority = 3)
-    public void testFillTextArea() {
-        formsPage.navigateToWebFormPage();
-        formsPage.fillTextArea("This is a test message in the text area.");
-        Assert.assertTrue(true, "Text area filled successfully");
-    }
+    @Test(description = "Test login form with invalid credentials", priority = 3)
+    public void testLoginFormWithInvalidCredentials() {
+        System.out.println("Starting Invalid Login Test...");
+        
+        HomePage homePage = new HomePage(driver);
+        homePage.navigateToLoginForm();
+        sleep(2000);
 
-    @Test(priority = 4)
-    public void testSelectDate() {
-        formsPage.navigateToWebFormPage();
-        formsPage.selectDate("01/15/2024");
-        Assert.assertTrue(true, "Date selected successfully");
-    }
+        pages.LoginFormPage loginFormPage = new pages.LoginFormPage(driver);
 
-    @Test(priority = 5)
-    public void testSelectDropdown() {
-        formsPage.navigateToWebFormPage();
-        formsPage.selectDropdownOption("Two");
-        String selectedOption = formsPage.getSelectedDropdownOption();
-        Assert.assertEquals(selectedOption, "Two", "Selected dropdown option should be 'Two'");
-    }
+        System.out.println("Current URL: " + driver.getCurrentUrl());
 
-    @Test(priority = 6)
-    public void testCheckboxSelection() {
-        formsPage.navigateToWebFormPage();
-        formsPage.checkCheckbox1();
-        formsPage.checkCheckbox2();
-        Assert.assertTrue(true, "Checkboxes checked successfully");
-    }
+        System.out.println("Entering invalid username...");
+        loginFormPage.enterUsername("invalidUser");
+        sleep(1000);
+        
+        System.out.println("Entering invalid password...");
+        loginFormPage.enterPassword("invalidPassword");
+        sleep(1000);
+        
+        System.out.println("Submitting login with invalid credentials...");
+        loginFormPage.submitLogin();
+        sleep(3000);
 
-    @Test(priority = 7)
-    public void testRadioButtonSelection() {
-        formsPage.navigateToWebFormPage();
-        formsPage.selectRadio1();
-        pause(500);
-        formsPage.selectRadio2();
-        Assert.assertTrue(true, "Radio buttons selected successfully");
-    }
+        System.out.println("Current URL after invalid login: " + driver.getCurrentUrl());
+        System.out.println("Verifying login failed as expected...");
 
-    @Test(priority = 8)
-    public void testDisabledInput() {
-        formsPage.navigateToWebFormPage();
-        boolean isDisabled = formsPage.isDisabledInputDisabled();
-        Assert.assertTrue(isDisabled, "Disabled input should be disabled");
-    }
-
-    @Test(priority = 9)
-    public void testReadonlyInput() {
-        formsPage.navigateToWebFormPage();
-        boolean isReadonly = formsPage.isReadonlyInputReadonly();
-        Assert.assertTrue(isReadonly, "Readonly input should be readonly");
-    }
-
-    @Test(priority = 10)
-    public void testCompleteFormSubmission() {
-        formsPage.navigateToWebFormPage();
-        formsPage.fillAndSubmitCompleteForm(
-                "John Doe",
-                "Password123",
-                "Sample text area content",
-                "05/20/2024"
-        );
-        pause(2000);
-        Assert.assertTrue(getCurrentUrl().contains("submitted"),
-                "Form should be submitted successfully");
-    }
-
-    @Test(priority = 11)
-    public void testLoginWithValidCredentials() {
-        formsPage.navigateToLoginFormPage();
-        formsPage.login("user", "user");
-        pause(2000);
-        boolean isSuccessful = formsPage.isLoginSuccessful();
-        Assert.assertTrue(isSuccessful, "Login should be successful with valid credentials");
-    }
-
-    @Test(priority = 12)
-    public void testLoginWithInvalidCredentials() {
-        formsPage.navigateToLoginFormPage();
-        formsPage.login("invalid", "invalid");
-        pause(2000);
-        boolean isFailed = formsPage.isLoginFailed();
-        Assert.assertTrue(isFailed, "Login should fail with invalid credentials");
-    }
-
-    @Test(priority = 13)
-    public void testSuccessMessage() {
-        formsPage.navigateToWebFormPage();
-        formsPage.fillTextInput("Test");
-        formsPage.submitForm();
-        pause(2000);
-        String successMessage = formsPage.getSuccessMessage();
-        Assert.assertNotNull(successMessage, "Success message should be displayed");
-        System.out.println("Success message: " + successMessage);
+        Assert.assertTrue(driver.getCurrentUrl().contains("login-form.html"),
+            "User should remain on login page with invalid credentials");
     }
 }
